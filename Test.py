@@ -14,53 +14,85 @@ def rotateMultiple(matrix,r):
             currentNewValCol = colNum
             transDone = 0
             ringNum = min(rowNum,colNum,(rowTotal-rowNum-1),colTotal-1-colNum)
-            
+            circumference = (2*(rowTotal-(2*ringNum))+2*(colTotal-(2*ringNum)))-4
 
+            topBound = ringNum
+            bottomBound = rowTotal-ringNum-1
+            leftBound = ringNum
+            rightBound = colTotal-ringNum-1
             
-            while transDone<r:
-                transLeft = r-transDone
+            transNeeded = r
+            if transNeeded>=circumference:
+                transNeeded = transNeeded % circumference
+            
+            while transDone<transNeeded:
+                transLeft = transNeeded-transDone
                 isTop = False
                 isRight = False
                 isBottom = False
                 isLeft = False
-                if currentNewValRow == ringNum:
+
+                if currentNewValRow == topBound:
                     isTop = True
-                elif currentNewValRow == len(returnMatrix)-ringNum-1:
+                elif currentNewValRow == bottomBound:
                     isBottom = True
-                if currentNewValCol == ringNum:
+                if currentNewValCol == leftBound:
                     isLeft = True
-                elif currentNewValCol == len(returnMatrix[rowNum])-ringNum-1:
+                elif currentNewValCol == rightBound:
                     isRight = True
 
+                cycleBroken = False
+                while (not cycleBroken) and transDone<transNeeded:
 
-                if isTop and not isRight:
-                    if transLeft > colTotal-2*ringNum:
-                        transDone+= colTotal-ringNum-currentNewValCol-1
-                        currentNewValCol = colTotal-ringNum-1
-                    else:
-                        currentNewValCol+=1
-                        transDone+=1
-                elif isRight and not isBottom:
-                    if transLeft > rowTotal-2*ringNum:
-                        transDone+=rowTotal-ringNum-currentNewValRow-1
-                        currentNewValRow = rowTotal-ringNum-1
-                    else:
-                        currentNewValRow+=1
-                        transDone+=1
-                elif isBottom and not isLeft:
-                    if transLeft > colTotal-2*ringNum:
-                        transDone += currentNewValCol-ringNum
-                        currentNewValCol = ringNum
-                    else:
-                        currentNewValCol-=1
-                        transDone+=1
-                elif isLeft and not isTop:
-                    if transLeft > rowTotal-2*ringNum:
-                        transDone+=currentNewValRow-ringNum
-                        currentNewValRow = ringNum
-                    else:
-                        currentNewValRow-=1
-                        transDone+=1
+
+                    if isTop and not isRight:
+                        if transLeft >= rightBound-currentNewValCol:
+                            transDone+= rightBound-currentNewValCol
+                            transLeft = transNeeded-transDone
+                            currentNewValCol = rightBound
+                            isRight = True
+                            isLeft = False
+                        elif transDone<transNeeded:
+                            currentNewValCol+=transLeft
+                            transDone+=transLeft
+                            transLeft = transNeeded-transDone
+                            cycleBroken = True
+                    if isRight and not isBottom:
+                        if transLeft >= bottomBound-currentNewValRow:
+                            transDone+=bottomBound-currentNewValRow
+                            transLeft = transNeeded-transDone
+                            currentNewValRow = bottomBound
+                            isBottom = True
+                            isTop = False
+                        elif transDone<transNeeded:
+                            currentNewValRow+=transLeft
+                            transDone+=transLeft
+                            transLeft = transNeeded-transDone
+                            cycleBroken = True
+                    if isBottom and not isLeft:
+                        if transLeft >= currentNewValCol-leftBound:
+                            transDone += currentNewValCol-leftBound
+                            transLeft = transNeeded-transDone
+                            currentNewValCol = leftBound
+                            isLeft = True
+                            isRight = False
+                        elif transDone<transNeeded:
+                            currentNewValCol-=transLeft
+                            transDone+=transLeft
+                            transLeft = transNeeded-transDone
+                            cycleBroken = True
+                    if isLeft and not isTop:
+                        if transLeft >= currentNewValRow-topBound:
+                            transDone+=currentNewValRow-topBound
+                            transLeft = transNeeded-transDone
+                            currentNewValRow = topBound
+                            isTop = True
+                            isBottom = False
+                        elif transDone<transNeeded:
+                            currentNewValRow-=transLeft
+                            transDone+=transLeft
+                            transLeft = transNeeded-transDone
+                            cycleBroken = True
             print(matrix[currentNewValRow][currentNewValCol], end=" ")
         print()
 
@@ -79,5 +111,5 @@ def matrixRotation(matrix, r):
     
     rotateMultiple(finalMatrix, minRotNum)
 
-testMatrix = [[1,2],[3,4]]
+testMatrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]
 matrixRotation(testMatrix,42971434)
